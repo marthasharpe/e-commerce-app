@@ -9,7 +9,6 @@ import { Modal } from "../ui/modal";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,6 +16,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -24,6 +24,8 @@ const formSchema = z.object({
 
 export const StoreModal = () => {
   const { isOpen, onClose } = useStoreModal();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
