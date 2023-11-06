@@ -16,7 +16,6 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -24,7 +23,6 @@ const formSchema = z.object({
 
 export const StoreModal = () => {
   const { isOpen, onClose } = useStoreModal();
-  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,11 +32,17 @@ export const StoreModal = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("values", values);
+    try {
+      const response = await fetch("/api/stores", {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+      console.log(response);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
   };
-  // const onSubmit = form.handleSubmit((data) => {
-  //   console.log(data);
-  // });
 
   return (
     <Modal
@@ -57,17 +61,27 @@ export const StoreModal = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="store name" {...field} />
+                    <Input
+                      disabled={form.formState.isSubmitting}
+                      placeholder="store name"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="flex justify-end space-x-4 pt-4">
-              <Button variant="outline" onClick={onClose}>
+              <Button
+                disabled={form.formState.isSubmitting}
+                variant="outline"
+                onClick={onClose}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Create</Button>
+              <Button disabled={form.formState.isSubmitting} type="submit">
+                Create
+              </Button>
             </div>
           </form>
         </Form>
