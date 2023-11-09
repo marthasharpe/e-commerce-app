@@ -39,11 +39,19 @@ export const StoreModal = () => {
         method: "POST",
         body: JSON.stringify(values),
       });
-      console.log(response);
+
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+
+      const responseData = await response.json();
+      console.log(responseData);
       onClose();
       toast({
         description: "Store created successfully",
       });
+
+      window.location.assign(`/${responseData.id}`);
     } catch (error) {
       console.error(error);
       toast({
